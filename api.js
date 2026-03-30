@@ -1,90 +1,83 @@
-// ── Elementos ──────────────────────────────────────────
-const cityInput  = document.getElementById('cityInput');
-const errorBox   = document.getElementById('errorBox');
-const searchCard = document.getElementById('searchCard');
-const resultCard = document.getElementById('resultCard');
-const tempValue  = document.getElementById('tempValue');
-const cityName   = document.getElementById('cityName');
-const searchBtn  = document.getElementById('searchBtn');
+const WMO_MAP = {
+  0: { desc: 'Céu limpo', icon: 'wi-day-sunny' },
+  1: { desc: 'Predom. limpo', icon: 'wi-day-cloudy' },
+  2: { desc: 'Parcialmente nublado', icon: 'wi-day-cloudy' },
+  3: { desc: 'Nublado', icon: 'wi-cloudy' },
+  45: { desc: 'Neblina', icon: 'wi-fog' },
+  61: { desc: 'Chuva leve', icon: 'wi-rain' },
+  63: { desc: 'Chuva moderada', icon: 'wi-rain' },
+  80: { desc: 'Pancadas de chuva', icon: 'wi-showers' },
+  95: { desc: 'Tempestade', icon: 'wi-thunderstorm' }
+};
 
-// ── Geocodificação: cidade → coordenadas ────────────────
-async function geocodeCity(city) {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=pt&format=json`;
-  const res  = await fetch(url);
-  const data = await res.json();
+const NIGHT_ICON_MAP = { 'wi-day-sunny': 'wi-night-clear', 'wi-day-cloudy': 'wi-night-alt-cloudy' };
 
-  if (!data.results || data.results.length === 0) {
-    throw new Error('Cidade não encontrada');
-  }
-
-  const { latitude, longitude, name, country } = data.results[0];
-  return { latitude, longitude, name, country };
+function getThemeByCode(code, isDay) {
+  if (!isDay) return 'theme-night';
+  if (code === 0) return 'theme-day';
+  if (code >= 1 && code <= 3) return 'theme-cloudy';
+  if (code >= 51 && code <= 82) return 'theme-rain';
+  if (code >= 95) return 'theme-storm';
+  return 'theme-day';
 }
 
-// ── Temperatura atual via Open-Meteo ────────────────────
-async function fetchTemperature(latitude, longitude) {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&temperature_unit=celsius`;
-  const res  = await fetch(url);
-  const data = await res.json();
-
-  if (!data.current_weather) {
-    throw new Error('Dados climáticos indisponíveis');
-  }
-
-  return Math.round(data.current_weather.temperature);
+// Nova função para formatar a hora baseada no Timezone da cidade buscada
+function formatLocalTime(timezone) {
+  const options = { 
+    weekday: 'long', day: 'numeric', month: 'long', 
+    hour: '2-digit', minute: '2-digit', 
+    timeZone: timezone 
+  };
+  const formatter = new Intl.DateTimeFormat('pt-BR', options);
+  return formatter.format(new Date());
 }
 
-// ── Handler principal ───────────────────────────────────
 async function handleSearch() {
-  const city = cityInput.value.trim();
-
-  if (!city) {
-    showError('Por favor, digite o nome de uma cidade.');
-    return;
-  }
-
-  hideError();
-  searchBtn.textContent = 'Buscando…';
-  searchBtn.disabled = true;
+  const city = document.getElementById('cityInput').value.trim();
+  if (!city) return;
 
   try {
-    const { latitude, longitude, name, country } = await geocodeCity(city);
-    const temp = await fetchTemperature(latitude, longitude);
+    // 1. Busca coordenadas e Fuso Horário (timezone)
+    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=pt&format=json`);
+    const geoData = await geoRes.json();
+    if (!geoData.results) return alert('Cidade não encontrada');
+    
+    const { latitude, longitude, name, country, timezone } = geoData.results[0];
 
-    tempValue.textContent = temp;
-    cityName.textContent  = `${name}, ${country}`;
+    // 2. Busca Clima usando o timezone da cidade
+    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=${encodeURIComponent(timezone)}`);
+    const weatherData = await weatherRes.json();
+    const { temperature, weathercode, is_day } = weatherData.current_weather;
 
-    searchCard.classList.add('hidden');
-    resultCard.classList.remove('hidden');
+    // 3. Aplica o Tema e Horário Local
+    document.body.className = getThemeByCode(weathercode, is_day === 1);
+    document.getElementById('dateTime').textContent = formatLocalTime(timezone);
 
-  } catch (err) {
-    showError('Cidade não encontrada. Tente novamente.');
-  } finally {
-    searchBtn.textContent = 'Buscar';
-    searchBtn.disabled = false;
-  }
+    // 4. Ícone e Textos
+    const wmo = WMO_MAP[weathercode] || { desc: 'Desconhecido', icon: 'wi-na' };
+    let iconClass = wmo.icon;
+    if (is_day === 0 && NIGHT_ICON_MAP[iconClass]) iconClass = NIGHT_ICON_MAP[iconClass];
+
+    document.getElementById('tempValue').textContent = Math.round(temperature);
+    document.getElementById('cityName').textContent = `${name}, ${country}`;
+    document.getElementById('weatherDesc').textContent = wmo.desc;
+    document.getElementById('weatherIcon').className = `wi weather-icon ${iconClass}`;
+
+    document.getElementById('searchCard').classList.add('hidden');
+    document.getElementById('resultCard').classList.remove('hidden');
+  } catch (e) { alert('Erro na busca'); }
 }
 
-// ── Voltar para a tela de busca ─────────────────────────
 function goHome() {
-  resultCard.classList.add('hidden');
-  searchCard.classList.remove('hidden');
-  cityInput.value = '';
-  hideError();
-  cityInput.focus();
+  document.getElementById('resultCard').classList.add('hidden');
+  document.getElementById('searchCard').classList.remove('hidden');
+  document.body.className = 'theme-day';
+  document.getElementById('cityInput').value = '';
 }
 
-// ── Helpers ─────────────────────────────────────────────
-function showError(msg) {
-  errorBox.textContent = msg;
-  errorBox.classList.remove('hidden');
-}
+document.getElementById('cityInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSearch(); });
 
-function hideError() {
-  errorBox.classList.add('hidden');
+//teste
+if (typeof module !== 'undefined') {
+  module.exports = { geocodeCity, fetchWeather, formatLocalTime };
 }
-
-// ── Enter para buscar ────────────────────────────────────
-cityInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') handleSearch();
-});
