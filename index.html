@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Previsão do Tempo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TELA DE BUSCA -->
+  <div class="card" id="searchCard">
+    <h1>Previsão do Tempo</h1>
+
+    <div class="form-row">
+      <input
+        type="text"
+        id="cityInput"
+        placeholder="Digite o nome da cidade"
+        autocomplete="off"
+      />
+      <button id="searchBtn" onclick="handleSearch()">Buscar</button>
+    </div>
+
+    <div class="error-box hidden" id="errorBox">
+      Cidade não encontrada. Tente novamente.
+    </div>
+  </div>
+
+  <!-- TELA DE RESULTADO -->
+  <div class="card hidden" id="resultCard">
+    <div class="temp-box">
+      <span id="tempValue">--</span><span class="degree">°</span>
+    </div>
+
+    <p class="city-name" id="cityName">--</p>
+
+    <button class="home-btn" onclick="goHome()" title="Voltar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12L12 3l9 9"/>
+        <path d="M9 21V12h6v9"/>
+      </svg>
+    </button>
+  </div>
+
+  <script src="api.js"></script>
+</body>
+</html>

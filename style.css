@@ -1,0 +1,256 @@
+/* ══════════════════════════════════════════
+   Reset & Base
+══════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* Fonte base fluida: escala entre 14px (320px) e 16px (1200px) */
+  font-size: clamp(14px, 1.5vw + 0.5rem, 16px);
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh; /* suporte a barras dinâmicas de celular */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: linear-gradient(160deg, #7dd3ea 0%, #a8dff0 40%, #c8edf7 100%);
+  padding: 16px;
+}
+
+/* ══════════════════════════════════════════
+   Card  (base → mobile-first)
+══════════════════════════════════════════ */
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(60, 130, 180, 0.18);
+  padding: 28px 20px 24px;
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  animation: fadeIn 0.35s ease;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ══════════════════════════════════════════
+   Search Card
+══════════════════════════════════════════ */
+h1 {
+  font-size: clamp(1.25rem, 4vw, 1.7rem);
+  font-weight: 700;
+  color: #2c4a6e;
+  letter-spacing: -0.5px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Formulário: coluna em celulares pequenos, linha nas demais */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 13px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #f0f4f8;
+  color: #2c4a6e;
+  outline: none;
+  transition: box-shadow 0.2s;
+  /* min 16px evita zoom automático no iOS */
+  font-size: max(16px, 1rem);
+}
+
+input[type="text"]::placeholder {
+  color: #a0b4c8;
+}
+
+input[type="text"]:focus {
+  box-shadow: 0 0 0 2.5px #4a90d9;
+}
+
+button#searchBtn {
+  width: 100%;
+  padding: 13px 26px;
+  background: #4a90d9;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: clamp(0.9rem, 3vw, 1rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+  min-height: 48px;
+  touch-action: manipulation;
+}
+
+button#searchBtn:hover  { background: #3578c0; }
+button#searchBtn:active { transform: scale(0.97); }
+
+/* ══════════════════════════════════════════
+   Error Box
+══════════════════════════════════════════ */
+.error-box {
+  width: 100%;
+  background: #fde8e8;
+  border-left: 4px solid #e87070;
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #c0392b;
+  font-size: clamp(0.8rem, 2.8vw, 0.92rem);
+  text-align: center;
+  word-break: break-word;
+}
+
+/* ══════════════════════════════════════════
+   Result Card
+══════════════════════════════════════════ */
+.temp-box {
+  background: linear-gradient(135deg, #d6e8f5 0%, #c2dced 100%);
+  border-radius: 14px;
+  width: 100%;
+  padding: clamp(20px, 6vw, 32px) 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+#tempValue {
+  font-size: clamp(3rem, 14vw, 4.5rem);
+  font-weight: 800;
+  color: #2c4a6e;
+  line-height: 1;
+}
+
+.degree {
+  font-size: clamp(2rem, 9vw, 3rem);
+  font-weight: 700;
+  color: #2c4a6e;
+  align-self: flex-start;
+  margin-top: 6px;
+}
+
+.city-name {
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-weight: 700;
+  color: #2c4a6e;
+  text-align: center;
+  word-break: break-word;
+  padding: 0 8px;
+}
+
+.home-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: #4a90d9;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+  touch-action: manipulation;
+}
+
+.home-btn svg {
+  width: 22px;
+  height: 22px;
+  stroke: #fff;
+}
+
+.home-btn:hover  { background: #3578c0; }
+.home-btn:active { transform: scale(0.95); }
+
+/* ══════════════════════════════════════════
+   Animation
+══════════════════════════════════════════ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════
+   BREAKPOINTS — mobile-first
+   base   → < 480px  (celulares antigos / pequenos)
+   480px  → celulares modernos (iPhone SE em diante)
+   600px  → celulares grandes / phablets
+   768px  → tablets portrait
+   1024px → tablets landscape / desktops
+══════════════════════════════════════════ */
+
+/* ── 480px: celulares modernos ── */
+@media (min-width: 480px) {
+  .card {
+    padding: 32px 28px 28px;
+    gap: 24px;
+  }
+
+  .form-row {
+    flex-direction: row;   /* input + botão lado a lado */
+  }
+
+  button#searchBtn {
+    width: auto;
+  }
+}
+
+/* ── 600px: phablets ── */
+@media (min-width: 600px) {
+  .card {
+    padding: 36px 36px 32px;
+    gap: 26px;
+    border-radius: 22px;
+  }
+}
+
+/* ── 768px: tablets portrait ── */
+@media (min-width: 768px) {
+  body {
+    padding: 24px;
+  }
+
+  .card {
+    padding: 40px 44px 36px;
+    gap: 28px;
+    border-radius: 24px;
+    max-width: 500px;
+  }
+
+  #tempValue { font-size: 4rem; }
+  .degree    { font-size: 2.8rem; }
+}
+
+/* ── 1024px: tablets landscape / desktops ── */
+@media (min-width: 1024px) {
+  .card {
+    max-width: 480px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   Preferência de movimento reduzido
+══════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .card                { animation: none; }
+  button#searchBtn,
+  .home-btn            { transition: none; }
+}
