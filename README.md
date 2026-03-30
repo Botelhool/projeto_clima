@@ -1,4 +1,4 @@
-# 🌤️ Weather Forecast Modern
+# 🌤️ Previsão do tempo
 
 Uma aplicação web elegante, responsiva e de alta performance para consulta de condições climáticas em tempo real. Este projeto utiliza geocodificação para localizar cidades globalmente e consome dados meteorológicos precisos através de APIs modernas.
 
