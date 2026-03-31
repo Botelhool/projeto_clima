@@ -352,28 +352,39 @@ async function handleSearch() {
     // 6. Preenche lista dos 5 dias
     const list = document.getElementById('forecastList');
     list.innerHTML = '';
-
     daily.forEach(day => {
-      const dayWmo = WMO_MAP[day.code] ?? { desc: 'Desconhecido', icon: 'wi-na' };
+  const dayWmo = WMO_MAP[day.code] ?? { desc: 'Desconhecido', icon: 'wi-na' };
+  const row = document.createElement('div');
+  row.className = 'forecast-row';
 
-      const row = document.createElement('div');
-      row.className = 'forecast-row';
-      row.innerHTML = `
-        <div class="forecast-day">
-          <span class="f-weekday">${day.weekday}</span>
-          <span class="f-date">${day.shortDate}</span>
-        </div>
-        <div class="forecast-cond">
-          <i class="wi ${dayWmo.icon} f-icon"></i>
-          <span class="f-desc">${dayWmo.desc}</span>
-        </div>
-        <div class="forecast-temps">
-          <span class="f-max">↑ ${day.max}°</span>
-          <span class="f-min">↓ ${day.min}°</span>
-        </div>
-      `;
-      list.appendChild(row);
-    });
+  // Estrutura base vazia
+  row.innerHTML = `
+    <div class="forecast-day">
+      <span class="f-weekday"></span>
+      <span class="f-date"></span>
+    </div>
+    <div class="forecast-cond">
+      <i class="wi f-icon"></i>
+      <span class="f-desc"></span>
+    </div>
+    <div class="forecast-temps">
+      <span class="f-max"></span>
+      <span class="f-min"></span>
+    </div>
+  `;
+
+  // Preenchimento blindado (Linhas cruciais para segurança)
+  row.querySelector('.f-weekday').textContent = day.weekday;
+  row.querySelector('.f-date').textContent = day.shortDate;
+  row.querySelector('.f-icon').className = `wi ${dayWmo.icon} f-icon`;
+  row.querySelector('.f-desc').textContent = dayWmo.desc;
+  row.querySelector('.f-max').textContent = `↑ ${day.max}°`;
+  row.querySelector('.f-min').textContent = `↓ ${day.min}°`;
+
+  list.appendChild(row);
+});
+   
+ 
 
     // 7. Troca de tela
     document.getElementById('searchCard').classList.add('hidden');
@@ -418,6 +429,56 @@ if (typeof document !== 'undefined') {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+//  INICIALIZAÇÃO E EVENTOS (Versão Corrigida para Navegador)
+// ══════════════════════════════════════════════════════════════════════════════
+
+if (typeof document !== 'undefined') {
+  // Em vez de window.handleSearch = handleSearch, vamos usar Event Listeners diretos
+  // Isso evita o erro de "Constant Variable" que deu no seu console
+  
+  const searchBtn = document.getElementById('searchBtn');
+  const cityInput = document.getElementById('cityInput');
+  const backBtn   = document.querySelector('.home-btn'); // O botão de "Nova busca"
+
+  // Configura o botão de busca
+  if (searchBtn) {
+    searchBtn.onclick = () => handleSearch();
+  }
+
+  // Configura a tecla Enter
+  if (cityInput) {
+    cityInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleSearch();
+    });
+  }
+
+  // Configura o botão de voltar (Nova busca)
+  if (backBtn) {
+    backBtn.onclick = () => goHome();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  EXPORTAÇÃO (Mantém os seus testes do Jest funcionando)
+// ══════════════════════════════════════════════════════════════════════════════
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    geocodeCity,
+    fetchWeather,
+    formatLocalTime,
+    formatDayLabel,
+    getThemeByCode,
+    friendlyError,
+    goHome,
+    handleSearch,
+    WMO_MAP,
+    NIGHT_ICON_MAP,
+    THEME_RULES,
+  };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 //  EXPORTAÇÃO (compatibilidade Node.js / testes)
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -429,6 +490,7 @@ if (typeof module !== 'undefined' && module.exports) {
     formatDayLabel,
     getThemeByCode,
     friendlyError,
+    goHome,
    
     WMO_MAP,
     NIGHT_ICON_MAP,

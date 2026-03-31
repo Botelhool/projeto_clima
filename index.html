@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
+  script-src 'self'; 
+  connect-src https://geocoding-api.open-meteo.com https://api.open-meteo.com; 
+  style-src 'self' https://cdnjs.cloudflare.com; 
+  font-src https://cdnjs.cloudflare.com;">
   <title>Previsão do Tempo</title>
 
   <link rel="stylesheet"
@@ -10,6 +15,7 @@
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <link rel="stylesheet" href="style.css" />
+
 </head>
 <body class="theme-day">
 
@@ -80,6 +86,18 @@
     </div>
 
   </div>
+  
+  <footer class="legal-footer">
+  <div class="legal-content">
+    <p>© 2026 Leonardo - Licença MIT</p>
+    <p>Dados meteorológicos por <a href="https://open-meteo.com/" target="_blank">Open-Meteo.com</a> (CC BY 4.0)</p>
+    <p>Ícones por <a href="https://erikflowers.github.io/weather-icons/" target="_blank">Weather Icons</a></p>
+    <div class="legal-links">
+      <a href="LICENSE" target="_blank">Licença</a> | 
+      <a href="NOTICE.md" target="_blank">Atribuições</a>
+    </div>
+  </div>
+</footer>
 
   <script src="api.js"></script>
 </body>

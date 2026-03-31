@@ -3,15 +3,25 @@
 ══════════════════════════════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+
+
 body {
-  min-height: 100vh;
+  min-height: 100vh; 
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column; /* Alinha os itens (card e footer) em coluna */
+  align-items: center; /* Centraliza horizontalmente */
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  padding: 20px 16px;
+  padding: 0 16px; /* Apenas padding lateral para mobile */
   transition: background 1s ease, color 0.4s ease;
+  overflow-x: hidden;
+ 
 }
+
+.card#searchCard{
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
 
 /* ══════════════════════════════════════════════════════════════════════════════
    Temas de Fundo
@@ -471,4 +481,42 @@ body.theme-storm .f-desc { color: #94a3b8; }
   .temp-max { font-size: 2.2rem; }
   .temp-min { font-size: 1.4rem; }
   .f-desc   { display: none; }
+}
+
+
+/*Footer */
+footer{
+  font-size: 0.7rem;
+  text-align: center;
+  margin-top: auto;
+  padding-top: 20px;
+  opacity: 0.7;
+  width: 100%;
+}
+
+.legal-footer {
+  margin-top: auto; 
+  padding: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.6); 
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.legal-footer a {
+  color: inherit;
+  text-decoration: underline;
+  transition: color 0.3s;
+}
+
+.legal-footer a:hover {
+  color: #fff;
+}
+
+/* Ajuste para o tema claro */
+body.theme-day .legal-footer {
+  color: #64748b;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
