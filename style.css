@@ -1,4 +1,6 @@
-/* Reset & Base */
+/* ══════════════════════════════════════════════════════════════════════════════
+   Reset & Base
+══════════════════════════════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -6,96 +8,467 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  padding: 16px;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  padding: 20px 16px;
   transition: background 1s ease, color 0.4s ease;
 }
 
-/* --- Temas de Clima (Fundo) --- */
-body.theme-day   { background: linear-gradient(160deg, #7dd3ea 0%, #a8dff0 40%, #c8edf7 100%); }
-body.theme-night { background: linear-gradient(160deg, #0d1b3e 0%, #1a2f5e 45%, #0f2447 100%); }
-body.theme-cloudy { background: linear-gradient(160deg, #708090 0%, #94a3b8 45%, #475569 100%); }
-body.theme-rain   { background: linear-gradient(160deg, #3a4b5c 0%, #546e7a 45%, #263238 100%); }
-body.theme-storm  { background: linear-gradient(160deg, #1f1c2c 0%, #445069 45%, #000000 100%); }
-body.theme-snow   { background: linear-gradient(160deg, #e2e8f0 0%, #ffffff 45%, #cbd5e1 100%); }
+/* ══════════════════════════════════════════════════════════════════════════════
+   Temas de Fundo
+══════════════════════════════════════════════════════════════════════════════ */
+body.theme-day    { background: linear-gradient(145deg, #dbeafe 0%, #eff6ff 50%, #e0f2fe 100%); }
+body.theme-night  { background: linear-gradient(145deg, #0d1b3e 0%, #1a2f5e 50%, #0f2447 100%); }
+body.theme-cloudy { background: linear-gradient(145deg, #cbd5e1 0%, #e2e8f0 50%, #94a3b8 100%); }
+body.theme-rain   { background: linear-gradient(145deg, #3a4b5c 0%, #546e7a 50%, #263238 100%); }
+body.theme-storm  { background: linear-gradient(145deg, #1f1c2c 0%, #2d3748 50%, #1a202c 100%); }
+body.theme-snow   { background: linear-gradient(145deg, #e2e8f0 0%, #f8fafc 50%, #cbd5e1 100%); }
 
-/* Card Styles */
+/* ══════════════════════════════════════════════════════════════════════════════
+   Card Base
+══════════════════════════════════════════════════════════════════════════════ */
 .card {
   background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 8px 40px rgba(60, 130, 180, 0.18);
-  padding: 32px;
+  border-radius: 32px;
+  box-shadow: 0 4px 24px rgba(37, 99, 235, 0.10), 0 1px 4px rgba(37, 99, 235, 0.06);
+  padding: 32px 28px;
   width: 100%;
-  max-width: 460px;
+  max-width: 440px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  animation: fadeIn 0.35s ease;
+  gap: 0;
+  animation: fadeIn 0.4s ease;
 }
 
-/* Ajuste visual para temas escuros */
-body:not(.theme-day):not(.theme-snow) .card {
-  background: rgba(28, 46, 80, 0.95);
+/* Modo escuro nos temas de fundo escuro */
+body.theme-night .card,
+body.theme-rain  .card,
+body.theme-storm .card {
+  background: rgba(18, 32, 68, 0.92);
   color: #e2eaf8;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
 }
 
 .hidden { display: none !important; }
 
-h1 { font-size: 1.7rem; font-weight: 700; color: #2c4a6e; }
-body:not(.theme-day):not(.theme-snow) h1 { color: #aac8f0; }
+/* ══════════════════════════════════════════════════════════════════════════════
+   Card de Busca
+══════════════════════════════════════════════════════════════════════════════ */
+.search-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  text-align: center;
+}
 
-.form-row { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.search-logo {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 4px;
+}
+
+.search-header h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1e3a5f;
+  letter-spacing: -0.5px;
+}
+
+.search-subtitle {
+  font-size: 0.88rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  stroke: #94a3b8;
+  pointer-events: none;
+}
 
 input[type="text"] {
-  width: 100%; padding: 13px; border: none; border-radius: 10px;
-  background: #f0f4f8; color: #2c4a6e; font-size: 1rem; outline: none;
+  width: 100%;
+  padding: 14px 14px 14px 42px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
+  color: #1e3a5f;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
 }
+
+input[type="text"]:focus {
+  border-color: #4a90d9;
+  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.12);
+  background: #ffffff;
+}
+
+input[type="text"]::placeholder { color: #94a3b8; }
 
 button#searchBtn {
-  padding: 13px 26px; background: #4a90d9; color: #fff;
-  border: none; border-radius: 10px; cursor: pointer; font-weight: 600;
-  transition: background 0.2s;
-}
-
-button#searchBtn:hover { background: #3578c0; }
-
-/* Resultado */
-.weather-icon { font-size: 5rem; color: #4a90d9; margin: 10px 0; transition: color 0.4s; }
-body.theme-day .wi-day-sunny { color: #ffca28; }
-
-.temp-box {
-  display: flex; align-items: flex-start; justify-content: center;
-  background: rgba(0, 0, 0, 0.05); border-radius: 14px; width: 100%; padding: 20px;
-}
-body:not(.theme-day):not(.theme-snow) .temp-box { background: rgba(255, 255, 255, 0.1); }
-
-#tempValue { font-size: 4rem; font-weight: 800; }
-.degree { font-size: 1.5rem; margin-top: 10px; font-weight: 700; }
-
-.weather-desc { font-weight: 500; text-transform: capitalize; }
-.city-name { font-weight: 700; font-size: 1.2rem; text-align: center; }
-
-/* Botão Home */
-.home-btn {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  background: #4a90d9;
+  padding: 14px;
+  background: #2563eb;
+  color: #fff;
   border: none;
+  border-radius: 16px;
   cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+button#searchBtn:hover  { background: #1d4ed8; box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4); }
+button#searchBtn:active { transform: scale(0.98); }
+button#searchBtn:disabled { background: #93c5fd; box-shadow: none; cursor: not-allowed; }
+
+.error-box {
+  margin-top: 4px;
+  padding: 10px 14px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Botão Voltar
+══════════════════════════════════════════════════════════════════════════════ */
+.home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 8px 14px 8px 10px;
+  border-radius: 20px;
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: background 0.2s, border-color 0.2s;
+  margin-bottom: 20px;
+}
+
+.home-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: #2563eb;
+  flex-shrink: 0;
+}
+
+.home-btn:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+body.theme-night .home-btn,
+body.theme-rain  .home-btn,
+body.theme-storm .home-btn {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.2);
+  color: #93c5fd;
+}
+
+body.theme-night .home-btn svg,
+body.theme-rain  .home-btn svg,
+body.theme-storm .home-btn svg { stroke: #93c5fd; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Destaque Atual: ícone + temperatura
+══════════════════════════════════════════════════════════════════════════════ */
+.current-highlight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background-color: #e3f2fd;
+  border-radius: 24px;
+  padding: 28px 20px 24px;
+  margin-bottom: 20px;
+  transition: background 0.4s;
+}
+
+body.theme-night .current-highlight,
+body.theme-rain  .current-highlight,
+body.theme-storm .current-highlight {
+  background-color: rgba(37, 99, 235, 0.18);
+}
+
+body.theme-cloudy .current-highlight { background-color: #f1f5f9; }
+body.theme-snow   .current-highlight { background-color: #f0f9ff; }
+
+.weather-icon {
+  font-size: 5rem;
+  color: #4a90d9;
+  line-height: 1;
+  transition: color 0.4s;
+}
+
+body.theme-day .wi-day-sunny { color: #f59e0b; }
+
+.temp-display {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.temp-max {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #1e3a5f;
+  letter-spacing: -1px;
+}
+
+.temp-separator {
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: #94a3b8;
+}
+
+.temp-min {
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: #64748b;
+}
+
+body.theme-night .temp-max,
+body.theme-rain  .temp-max,
+body.theme-storm .temp-max { color: #e2eaf8; }
+
+body.theme-night .temp-min,
+body.theme-rain  .temp-min,
+body.theme-storm .temp-min { color: #94a3b8; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Informações de Localização
+══════════════════════════════════════════════════════════════════════════════ */
+.location-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 0 4px;
+}
+
+.city-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1e3a5f;
+  letter-spacing: -0.3px;
+}
+
+.country-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4a90d9;
+}
+
+.weather-desc {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #475569;
+  text-transform: capitalize;
+  margin-top: 2px;
+}
+
+.date-time {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+body.theme-night .city-name,
+body.theme-rain  .city-name,
+body.theme-storm .city-name { color: #e2eaf8; }
+
+body.theme-night .weather-desc,
+body.theme-rain  .weather-desc,
+body.theme-storm .weather-desc { color: #94a3b8; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Divisor de Seção
+══════════════════════════════════════════════════════════════════════════════ */
+.section-divider {
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: background 0.2s, transform 0.1s;
-  margin-top: 10px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-.home-btn svg { width: 24px; height: 24px; stroke: #fff; }
-.home-btn:hover { background: #3578c0; }
-.home-btn:active { transform: scale(0.95); }
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.section-divider span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
 
-@media (min-width: 480px) { .form-row { flex-direction: row; } }
+body.theme-night .section-divider::before,
+body.theme-night .section-divider::after,
+body.theme-rain  .section-divider::before,
+body.theme-rain  .section-divider::after,
+body.theme-storm .section-divider::before,
+body.theme-storm .section-divider::after {
+  background: rgba(255,255,255,0.12);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Lista de Previsão dos 5 Dias
+══════════════════════════════════════════════════════════════════════════════ */
+.forecast-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.forecast-row {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  transition: background 0.15s;
+}
+
+.forecast-row:hover { background: #f8fafc; }
+
+body.theme-night .forecast-row:hover,
+body.theme-rain  .forecast-row:hover,
+body.theme-storm .forecast-row:hover { background: rgba(255,255,255,0.06); }
+
+/* Dia / Data */
+.forecast-day {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.f-weekday {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1e3a5f;
+}
+
+.f-date {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+body.theme-night .f-weekday,
+body.theme-rain  .f-weekday,
+body.theme-storm .f-weekday { color: #dbeafe; }
+
+/* Ícone + Descrição */
+.forecast-cond {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.f-icon {
+  font-size: 1.3rem;
+  color: #4a90d9;
+  flex-shrink: 0;
+}
+
+.f-desc {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.theme-night .f-desc,
+body.theme-rain  .f-desc,
+body.theme-storm .f-desc { color: #94a3b8; }
+
+/* Temperaturas Máx / Mín */
+.forecast-temps {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.f-max {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.f-min {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: #2563eb;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Animação
+══════════════════════════════════════════════════════════════════════════════ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Responsivo
+══════════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 480px) {
+  .form-group { flex-direction: row; }
+
+  button#searchBtn {
+    padding: 14px 26px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .card { padding: 24px 18px; border-radius: 24px; }
+  .temp-max { font-size: 2.2rem; }
+  .temp-min { font-size: 1.4rem; }
+  .f-desc   { display: none; }
+}

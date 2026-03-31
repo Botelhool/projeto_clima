@@ -1,146 +1,90 @@
-// ── Simulação da Lógica da nossa API ───────────────────────
-// Em um projeto avançado, importaríamos isso do api.js. 
-// Aqui, isolamos a lógica puramente matemática e de requisição para o Node testar.
-async function simularBuscaClima(cidade) {
-  if (!cidade || cidade.trim() === '') {
-    throw new Error('Entrada vazia. Digite uma cidade.');
-  }
+// Importa o módulo que você desenvolveu. O require permite acessar 
+// as funções exportadas no final do seu api.js.
+const api = require('../api');
 
-  // Simula o timeout (Erro de conexão lenta)
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 segundo de limite
+describe('Testes de Integração/Unidade - API de Clima', () => {
 
-  try {
-    const res = await fetch(`https://api.exemplo.com/weather?q=${cidade}`, {
-      signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
-
-    if (res.status === 429) {
-      throw new Error('Excesso de requisições. Tente mais tarde.');
-    }
-    
-    if (!res.ok) {
-      throw new Error('Falha na API');
-    }
-
-    const data = await res.json();
-
-    // Simula mudança de formato da API (quebra de contrato)
-    if (!data.results && !data.current) {
-      throw new Error('Formato de resposta inválido');
-    }
-
-    if (data.results && data.results.length === 0) {
-      throw new Error('Cidade não encontrada');
-    }
-
-    return data;
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      throw new Error('Timeout de conexão');
-    }
-    throw error;
-  }
-}
-
-// ── Início dos Testes do Jest ──────────────────────────────
-describe('Testes Unitários - App de Clima', () => {
-  
-  // Limpa as simulações antes de cada teste para não misturar resultados
+  // Executado antes de cada 'it'. Garante que um teste não 
+  // influencie o resultado do próximo.
   beforeEach(() => {
     global.fetch = jest.fn();
   });
+
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  // 1. Cenário de Sucesso
-  it('1. Nome de cidade válido retorna dados meteorológicos', async () => {
-    // Simulando uma resposta perfeita da API
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({ results: [{ name: 'Londres' }], current: { temperature_2m: 15 } })
+  describe('geocodeCity()', () => {
+    it('Deve retornar coordenadas quando a cidade existe', async () => {
+
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          results: [{ latitude: -22.9, longitude: -43.1, name: 'Rio de Janeiro', country: 'Brazil', timezone: 'America/Sao_Paulo' }]
+        })
+      });
+
+      const resultado = await api.geocodeCity('Rio de Janeiro');
+      expect(resultado.latitude).toBe(-22.9);
+      expect(resultado.name).toBe('Rio de Janeiro');
     });
 
-    const resultado = await simularBuscaClima('Londres');
-    expect(resultado.results[0].name).toBe('Londres');
-    expect(resultado.current.temperature_2m).toBe(15);
-  });
+    it('Deve lançar erro NOT_FOUND para cidade inexistente', async () => {
 
-  // 2. Erro Tratado (Cidade não existe)
-  it('2. Nome de cidade inexistente lança exceção tratada', async () => {
-    // Simulando API retornando array vazio (cidade não achada)
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({ results: [] })
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ results: [] })
+      });
+
+
+      await expect(api.geocodeCity('CidadeQueNaoExiste')).rejects.toThrow('NOT_FOUND');
     });
 
-    await expect(simularBuscaClima('CidadeInventada123')).rejects.toThrow('Cidade não encontrada');
+    it('Deve lançar erro NETWORK em falha de conexão', async () => {
+
+      global.fetch.mockRejectedValueOnce(new Error('Failed to fetch'));
+      await expect(api.geocodeCity('Paris')).rejects.toThrow('NETWORK');
+    });
   });
 
-  // 3. Erro de Validação (Input vazio)
-  it('3. Entrada vazia retorna erro de validação', async () => {
-    // Nem chega a chamar o fetch
-    await expect(simularBuscaClima('')).rejects.toThrow('Entrada vazia');
-    await expect(simularBuscaClima('   ')).rejects.toThrow('Entrada vazia');
-  });
+  describe('fetchWeather()', () => {
+    it('Deve processar corretamente os dados atuais e a previsão de 5 dias', async () => {
+      // Mock de uma resposta completa da Open-Meteo (tempo atual + arrays de previsão).
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          current_weather: { temperature: 25, weathercode: 0, is_day: 1 },
+          daily: {
+            time: ['2026-03-31', '2026-04-01', '2026-04-02', '2026-04-03', '2026-04-04'],
+            weather_code: [0, 1, 2, 3, 45],
+            temperature_2m_max: [30, 28, 27, 26, 25],
+            temperature_2m_min: [20, 19, 18, 17, 16]
+          }
+        })
+      });
 
-  // 4. Falha na API (Erro 500)
-  it('4. Falha da API gera resposta adequada (timeout ou erro)', async () => {
-    // Simulando servidor fora do ar
-    global.fetch.mockResolvedValueOnce({
-      ok: false,
-      status: 500
+      const dados = await api.fetchWeather(-22.9, -43.1, 'America/Sao_Paulo');
+      expect(dados.temp).toBe(25);
+      expect(dados.daily).toHaveLength(5);
+      expect(dados.daily[0].weekday).toBe('Hoje');
     });
 
-    await expect(simularBuscaClima('Paris')).rejects.toThrow('Falha na API');
+    it('Deve lançar API_ERROR quando o status do servidor for 500', async () => {
+      global.fetch.mockResolvedValueOnce({ ok: false });
+      await expect(api.fetchWeather(0, 0, 'UTC')).rejects.toThrow('API_ERROR');
+    });
   });
 
-  // 5. Rate Limit (Status 429)
-  it('5. Excesso de requisições deve ser bloqueado', async () => {
-    global.fetch.mockResolvedValueOnce({
-      ok: false,
-      status: 429 // Status HTTP padrão para "Too Many Requests"
+  describe('Utilidades de Interface', () => {
+    it('friendlyError deve traduzir códigos para mensagens amigáveis', () => {
+      expect(api.friendlyError('NOT_FOUND')).toContain('Cidade não encontrada');
+      expect(api.friendlyError('CODIGO_INVALIDO')).toBe('Ocorreu um erro inesperado. Tente novamente.');
     });
 
-    await expect(simularBuscaClima('Roma')).rejects.toThrow('Excesso de requisições');
-  });
-
-  // 6. Timeout (Demorou mais de 1 segundo)
-  it('6. Conexão lenta deve dar timeout', async () => {
-    // Simulando um fetch que entende o sinal do AbortController
-    global.fetch.mockImplementationOnce((url, options) => 
-      new Promise((resolve, reject) => {
-        const timer = setTimeout(() => resolve({ ok: true, status: 200 }), 1100);
-        
-        // Se a função enviar um sinal de abortar (aos 1000ms), nós rejeitamos com o erro certo
-        if (options && options.signal) {
-          options.signal.addEventListener('abort', () => {
-            clearTimeout(timer);
-            reject({ name: 'AbortError' });
-          });
-        }
-      })
-    );
-
-    await expect(simularBuscaClima('Tóquio')).rejects.toThrow('Timeout de conexão');
-  });
-
-  // 7. Mudança na estrutura da API
-  it('7. API mudou e quebrou o formato', async () => {
-    // Simulando a API retornando um formato que não tem "results" nem "current"
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({ dados_aleatorios: true, clima: 'sol' }) // Estrutura errada
+    it('getThemeByCode deve retornar o tema correto para chuva e noite', () => {
+      expect(api.getThemeByCode(61, true)).toBe('theme-rain');
+      expect(api.getThemeByCode(0, false)).toBe('theme-night');
     });
-
-    await expect(simularBuscaClima('Berlim')).rejects.toThrow('Formato de resposta inválido');
   });
-
 });
